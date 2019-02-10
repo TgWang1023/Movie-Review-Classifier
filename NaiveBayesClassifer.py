@@ -12,6 +12,10 @@ f3 = open(sys.argv[3], 'r')
 f4 = open(sys.argv[4], 'r')
 
 # multinomial naive bayes classifier
+
+# common puncuation marks
+marks = {",", ":", "'", ".", "-", "!", "?", ";"}
+
 # reading from positive training data
 pos_dict = {}
 total_pos_words = 0
@@ -22,6 +26,8 @@ for word in f1.read().split():
             word = word[:-3]
         if word[:2] == "/>":
             word = word[2:]
+        if word[-1:] in marks:
+            word = word[:-1]
         if word in pos_dict:
             pos_dict[word] += 1
         else:
@@ -39,6 +45,8 @@ for word in f2.read().split():
             word = word[:-3]
         if word[:2] == "/>":
             word = word[2:]
+        if word[-1:] in marks:
+            word = word[:-1]
         if word in neg_dict:
             neg_dict[word] += 1
         else:
