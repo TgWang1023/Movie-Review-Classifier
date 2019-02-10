@@ -2,11 +2,19 @@ import sys
 import copy
 import math
 
-# Multinomial Naive Bayes Classifier
+# check inputs and initlialize files
+if len(sys.argv) != 5:
+    print("Invalid number of arguments. Follow the format: NaiveBayesClassifer.py *POS TRAINING FILE* *NEG TRAINING FILE* *POS TEST FILE* *NEG TEST FILE*")
+    exit(0)
+f1 = open(sys.argv[1], 'r')
+f2 = open(sys.argv[2], 'r')
+f3 = open(sys.argv[3], 'r')
+f4 = open(sys.argv[4], 'r')
+
+# multinomial naive bayes classifier
 # reading from positive training data
 pos_dict = {}
 total_pos_words = 0
-f1 = open(sys.argv[1], 'r')
 for word in f1.read().split():
     # print(word)
     if word != "/><br":
@@ -24,7 +32,6 @@ total_pos_words += 1
 # reading from negative training data
 neg_dict = {}
 total_neg_words = 0
-f2 = open(sys.argv[2], 'r')
 for word in f2.read().split():
     # print(word)
     if word != "/><br":
@@ -53,7 +60,6 @@ total_guesses = 0
 correct_guesses = 0
 
 # reading from positive test data
-f3 = open(sys.argv[3], 'r')
 review = []
 pos_result = 1.0
 neg_result = 1.0
@@ -106,7 +112,6 @@ for w in f3.read().split():
             neg_result = 1.0
 
 # reading from negative test data
-f4 = open(sys.argv[4], 'r')
 review = []
 pos_result = 1.0
 neg_result = 1.0
