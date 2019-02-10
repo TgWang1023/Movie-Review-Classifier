@@ -99,31 +99,28 @@ for w in f3.read().split():
     else:
         for word in review:
             if word in pos_dict:
-                new_pos = pos_result * ((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
-                # while new_pos <= 0:
-                #     pos_result = math.log10(pos_result)
-                #     new_pos = pos_result * (pos_dict[word] / total_pos_words)
-                pos_result = new_pos
+                pos_result = pos_result * ((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
             else:
                 # laplace smoothing
-                new_pos = pos_result * (1 / (total_pos_words + len(total_dict)))
-                # while new_pos <= 0:
-                #     pos_result = math.log10(pos_result)
-                #     new_pos = pos_result * (pos_dict[word] / total_pos_words)
-                pos_result = new_pos
+                pos_result = pos_result * (1 / (total_pos_words + len(total_dict)))
             if word in neg_dict:
-                new_neg = neg_result * ((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
-                # while new_neg <= 0:
-                #     neg_result = math.log10(neg_result)
-                #     new_neg = neg_result * (neg_dict[word] / total_neg_words)
-                neg_result = new_neg
+                neg_result = neg_result * ((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
             else:
                 # laplace smoothing
-                new_neg = neg_result * (1 / (total_neg_words + len(total_dict)))
-                # while new_neg <= 0:
-                #     neg_result = math.log10(neg_result)
-                #     new_neg = neg_result * (neg_dict[word] / total_neg_words)
-                neg_result = new_neg
+                neg_result = neg_result * (1 / (total_neg_words + len(total_dict)))
+        # result underflows
+        if pos_result == 0 and neg_result == 0:
+            for word in review:
+                if word in pos_dict:
+                    pos_result = pos_result + math.log10((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
+                else:
+                    # laplace smoothing
+                    pos_result = pos_result + math.log10(1 / (total_pos_words + len(total_dict)))
+                if word in neg_dict:
+                    neg_result = neg_result + math.log10((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
+                else:
+                    # laplace smoothing
+                    neg_result = neg_result + math.log10(1 / (total_neg_words + len(total_dict)))
         print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
         if pos_result >= neg_result:
             print("Predicted: Positive / Actual: Positive")
@@ -156,31 +153,28 @@ for w in f4.read().split():
     else:
         for word in review:
             if word in pos_dict:
-                new_pos = pos_result * ((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
-                # while new_pos <= 0:
-                #     pos_result = math.log10(pos_result)
-                #     new_pos = pos_result * (pos_dict[word] / total_pos_words)
-                pos_result = new_pos
+                pos_result = pos_result * ((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
             else:
                 # laplace smoothing
-                new_pos = pos_result * (1 / (total_pos_words + len(total_dict)))
-                # while new_pos <= 0:
-                #     pos_result = math.log10(pos_result)
-                #     new_pos = pos_result * (pos_dict[word] / total_pos_words)
-                pos_result = new_pos
+                pos_result = pos_result * (1 / (total_pos_words + len(total_dict)))
             if word in neg_dict:
-                new_neg = neg_result * ((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
-                # while new_neg <= 0:
-                #     neg_result = math.log10(neg_result)
-                #     new_neg = neg_result * (neg_dict[word] / total_neg_words)
-                neg_result = new_neg
+                neg_result = neg_result * ((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
             else:
                 # laplace smoothing
-                new_neg = neg_result * (1 / (total_neg_words + len(total_dict)))
-                # while new_neg <= 0:
-                #     neg_result = math.log10(neg_result)
-                #     new_neg = neg_result * (neg_dict[word] / total_neg_words)
-                neg_result = new_neg
+                neg_result = neg_result * (1 / (total_neg_words + len(total_dict)))
+        # result underflows
+        if pos_result == 0.0 and neg_result == 0.0:
+            for word in review:
+                if word in pos_dict:
+                    pos_result = pos_result + math.log10((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
+                else:
+                    # laplace smoothing
+                    pos_result = pos_result + math.log10(1 / (total_pos_words + len(total_dict)))
+                if word in neg_dict:
+                    neg_result = neg_result + math.log10((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
+                else:
+                    # laplace smoothing
+                    neg_result = neg_result + math.log10(1 / (total_neg_words + len(total_dict)))
         print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
         if pos_result >= neg_result:
             print("Predicted: Positive / Actual: Negative")
