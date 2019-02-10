@@ -66,14 +66,14 @@ for word in f2.read().split():
         total_neg_words += 1
 total_neg_words += 1
 
-# # combining data from both sets
-# total_dict = copy.deepcopy(pos_dict)
-# total_words = total_pos_words + total_neg_words
-# for word, count in neg_dict.items():
-#     if word in total_dict:
-#         total_dict[word] += count
-#     else:
-#         total_dict[word] = count
+# combining data from both sets
+total_dict = copy.deepcopy(pos_dict)
+total_words = total_pos_words + total_neg_words
+for word, count in neg_dict.items():
+    if word in total_dict:
+        total_dict[word] += count
+    else:
+        total_dict[word] = count
 
 # recording accuracy
 total_guesses = 0
@@ -99,42 +99,42 @@ for w in f3.read().split():
     else:
         for word in review:
             if word in pos_dict:
-                new_pos = pos_result * (pos_dict[word] / total_pos_words)
+                new_pos = pos_result * ((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
                 # while new_pos <= 0:
                 #     pos_result = math.log10(pos_result)
                 #     new_pos = pos_result * (pos_dict[word] / total_pos_words)
                 pos_result = new_pos
             else:
                 # laplace smoothing
-                new_pos = pos_result * (1 / total_pos_words)
+                new_pos = pos_result * (1 / (total_pos_words + len(total_dict)))
                 # while new_pos <= 0:
                 #     pos_result = math.log10(pos_result)
                 #     new_pos = pos_result * (pos_dict[word] / total_pos_words)
                 pos_result = new_pos
             if word in neg_dict:
-                new_neg = neg_result * (neg_dict[word] / total_neg_words)
+                new_neg = neg_result * ((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
                 # while new_neg <= 0:
                 #     neg_result = math.log10(neg_result)
                 #     new_neg = neg_result * (neg_dict[word] / total_neg_words)
                 neg_result = new_neg
             else:
                 # laplace smoothing
-                new_neg = neg_result * (1 / total_neg_words)
+                new_neg = neg_result * (1 / (total_neg_words + len(total_dict)))
                 # while new_neg <= 0:
                 #     neg_result = math.log10(neg_result)
                 #     new_neg = neg_result * (neg_dict[word] / total_neg_words)
                 neg_result = new_neg
-            print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
-            if pos_result >= neg_result:
-                print("Predicted: Positive / Actual: Positive")
-                correct_guesses += 1
-            else:
-                print("Predicted: Negative / Actual: Positive")
-            total_guesses += 1
-            # reset parameters
-            review = []
-            pos_result = 1.0
-            neg_result = 1.0
+        print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
+        if pos_result >= neg_result:
+            print("Predicted: Positive / Actual: Positive")
+            correct_guesses += 1
+        else:
+            print("Predicted: Negative / Actual: Positive")
+        total_guesses += 1
+        # reset parameters
+        review = []
+        pos_result = 1.0
+        neg_result = 1.0
 
 # reading from negative test data
 review = []
@@ -156,42 +156,42 @@ for w in f4.read().split():
     else:
         for word in review:
             if word in pos_dict:
-                new_pos = pos_result * (pos_dict[word] / total_pos_words)
+                new_pos = pos_result * ((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
                 # while new_pos <= 0:
                 #     pos_result = math.log10(pos_result)
                 #     new_pos = pos_result * (pos_dict[word] / total_pos_words)
                 pos_result = new_pos
             else:
                 # laplace smoothing
-                new_pos = pos_result * (1 / total_pos_words)
+                new_pos = pos_result * (1 / (total_pos_words + len(total_dict)))
                 # while new_pos <= 0:
                 #     pos_result = math.log10(pos_result)
                 #     new_pos = pos_result * (pos_dict[word] / total_pos_words)
                 pos_result = new_pos
             if word in neg_dict:
-                new_neg = neg_result * (neg_dict[word] / total_neg_words)
+                new_neg = neg_result * ((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
                 # while new_neg <= 0:
                 #     neg_result = math.log10(neg_result)
                 #     new_neg = neg_result * (neg_dict[word] / total_neg_words)
                 neg_result = new_neg
             else:
                 # laplace smoothing
-                new_neg = neg_result * (1 / total_neg_words)
+                new_neg = neg_result * (1 / (total_neg_words + len(total_dict)))
                 # while new_neg <= 0:
                 #     neg_result = math.log10(neg_result)
                 #     new_neg = neg_result * (neg_dict[word] / total_neg_words)
                 neg_result = new_neg
-            print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
-            if pos_result >= neg_result:
-                print("Predicted: Positive / Actual: Negative")
-            else:
-                print("Predicted: Negative / Actual: Negative")
-                correct_guesses += 1
-            total_guesses += 1
-            # reset parameters
-            review = []
-            pos_result = 1.0
-            neg_result = 1.0
+        print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
+        if pos_result >= neg_result:
+            print("Predicted: Positive / Actual: Negative")
+        else:
+            print("Predicted: Negative / Actual: Negative")
+            correct_guesses += 1
+        total_guesses += 1
+        # reset parameters
+        review = []
+        pos_result = 1.0
+        neg_result = 1.0
 
 # print final result
 print("---------------")
