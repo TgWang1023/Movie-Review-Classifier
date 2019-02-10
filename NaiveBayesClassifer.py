@@ -30,7 +30,7 @@ pos_dict = {}
 total_pos_words = 0
 for word in f1.read().split():
     # print(word)
-    if word != "/><br":
+    if word != "/><br" and word not in stop_words:
         if word[-3:] == "<br":
             word = word[:-3]
         if word[:2] == "/>":
@@ -49,7 +49,7 @@ neg_dict = {}
 total_neg_words = 0
 for word in f2.read().split():
     # print(word)
-    if word != "/><br":
+    if word != "/><br" and word not in stop_words:
         if word[-3:] == "<br":
             word = word[:-3]
         if word[:2] == "/>":
@@ -83,11 +83,14 @@ neg_result = 1.0
 for w in f3.read().split():
     # print(w)
     if w != "/><br":
-        if w[-3:] == "<br":
-            w = w[:-3]
-        if w[:2] == "/>":
-            w = w[2:]
-        review.append(w)
+        if word not in stop_words:
+            if w[-3:] == "<br":
+                w = w[:-3]
+            if w[:2] == "/>":
+                w = w[2:]
+            if w[-1:] in marks:
+                w = w[:-1]
+            review.append(w)
     else:
         for word in review:
             if word in pos_dict:
@@ -135,11 +138,14 @@ neg_result = 1.0
 for w in f4.read().split():
     # print(w)
     if w != "/><br":
-        if w[-3:] == "<br":
-            w = w[:-3]
-        if w[:2] == "/>":
-            w = w[2:]
-        review.append(w)
+        if word not in stop_words:
+            if w[-3:] == "<br":
+                w = w[:-3]
+            if w[:2] == "/>":
+                w = w[2:]
+            if w[-1:] in marks:
+                w = w[:-1]
+            review.append(w)
     else:
         for word in review:
             if word in pos_dict:
