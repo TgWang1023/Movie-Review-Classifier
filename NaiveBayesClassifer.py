@@ -196,6 +196,12 @@ for w in f4.read().split():
 # print final result
 print("---------------")
 print("Final Result: ")
+print("---------------")
+print("Gaussian Naive Bayes classifier using BoW feature")
+print("---------------")
+print("Gaussian Naive Bayes classifier using TF-IDF feature")
+print("---------------")
+print("Multinomial Naive Bayes classifier using BoW feature")
 print("Total Prediction: " + str(total_guesses))
 print("Correct Prediction: " + str(correct_guesses))
 print("Accuracy: " + str(correct_guesses / total_guesses))
