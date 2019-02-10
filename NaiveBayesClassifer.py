@@ -11,10 +11,8 @@ f2 = open(sys.argv[2], 'r')
 f3 = open(sys.argv[3], 'r')
 f4 = open(sys.argv[4], 'r')
 
-# multinomial naive bayes classifier
-
 # common puncuation marks
-marks = {",", ":", "'", ".", "-", "!", "?", ";"}
+marks = {",", ":", "'", ".", "-", "!", "?", ";", "(", ")"}
 # stop words
 stop_words = {"a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "as", "at", "be", "because", "been", "before", "being", 
     "below", "between", "both", "but", "by", "could", "did", "do", "does", "doing", "down", "during", "each", "few", "for", "from", "further", "had", "has", "have", 
@@ -25,6 +23,7 @@ stop_words = {"a", "about", "above", "after", "again", "against", "all", "am", "
     "until", "up", "very", "was", "we", "we’d", "we’ll", "we’re", "we’ve", "were", "what", "what’s", "when", "when’s", "where", "where’s", "which", "while", "who", "who’s", 
     "whom", "why", "why’s", "with", "would", "you", "you’d", "you’ll", "you’re", "you’ve", "your", "yours", "yourself", "yourselves"}
 
+# multinomial naive bayes classifier
 # reading from positive training data
 pos_dict = {}
 total_pos_words = 0
@@ -37,13 +36,15 @@ for word in f1.read().split():
             word = word[2:]
         if word[-1:] in marks:
             word = word[:-1]
+        if word[:1] in marks:
+            word = word[1:]
         if word in pos_dict:
             pos_dict[word] += 1
         else:
             pos_dict[word] = 1
         total_pos_words += 1
 total_pos_words += 1
-    
+
 # reading from negative training data
 neg_dict = {}
 total_neg_words = 0
@@ -56,6 +57,8 @@ for word in f2.read().split():
             word = word[2:]
         if word[-1:] in marks:
             word = word[:-1]
+        if word[:1] in marks:
+            word = word[1:]
         if word in neg_dict:
             neg_dict[word] += 1
         else:
@@ -90,6 +93,8 @@ for w in f3.read().split():
                 w = w[2:]
             if w[-1:] in marks:
                 w = w[:-1]
+            if w[:1] in marks:
+                w = w[1:]
             review.append(w)
     else:
         for word in review:
@@ -145,6 +150,8 @@ for w in f4.read().split():
                 w = w[2:]
             if w[-1:] in marks:
                 w = w[:-1]
+            if w[:1] in marks:
+                w = w[1:]
             review.append(w)
     else:
         for word in review:
