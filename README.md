@@ -1,1 +1,1 @@
-# Product-Review-Classifier
+# Movie-Review-Classifier
