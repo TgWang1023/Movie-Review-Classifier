@@ -83,7 +83,7 @@ neg_result = 1.0
 for w in f3.read().split():
     # print(w)
     if w != "/><br":
-        if word not in stop_words:
+        if w not in stop_words:
             if w[-3:] == "<br":
                 w = w[:-3]
             if w[:2] == "/>":
@@ -138,7 +138,7 @@ neg_result = 1.0
 for w in f4.read().split():
     # print(w)
     if w != "/><br":
-        if word not in stop_words:
+        if w not in stop_words:
             if w[-3:] == "<br":
                 w = w[:-3]
             if w[:2] == "/>":
