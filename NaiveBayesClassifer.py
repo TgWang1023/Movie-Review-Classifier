@@ -1,5 +1,7 @@
 import sys
+import copy
 
+# Multinomial Naive Bayes Classifier
 # reading from positive training data
 pos_dict = {}
 total_pos_words = 0
@@ -16,6 +18,7 @@ for word in f1.read().split():
         else:
             pos_dict[word] = 1
         total_pos_words += 1
+total_pos_words += 1
     
 # reading from negative training data
 neg_dict = {}
@@ -33,3 +36,17 @@ for word in f2.read().split():
         else:
             neg_dict[word] = 1
         total_neg_words += 1
+total_neg_words += 1
+
+# combining data from both sets
+total_dict = copy.deepcopy(pos_dict)
+total_words = total_pos_words + total_neg_words
+for word, count in neg_dict.items():
+    if word in total_dict:
+        total_dict[word] += count
+    else:
+        total_dict[word] = count
+
+print(len(pos_dict))
+print(len(neg_dict))
+print(len(total_dict))
