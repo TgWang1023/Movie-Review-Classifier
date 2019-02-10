@@ -81,9 +81,9 @@ for word, count in neg_dict.items():
     else:
         total_dict[word] = count
 
-# recording accuracy
-total_guesses = 0
-correct_guesses = 0
+# recording accuracy for (3)
+total_guesses_3 = 0
+correct_guesses_3 = 0
 
 # reading from positive test data
 review = []
@@ -130,10 +130,10 @@ for w in f3.read().split():
         print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
         if pos_result >= neg_result:
             print("Predicted: Positive / Actual: Positive")
-            correct_guesses += 1
+            correct_guesses_3 += 1
         else:
             print("Predicted: Negative / Actual: Positive")
-        total_guesses += 1
+        total_guesses_3 += 1
         # reset parameters
         review = []
         pos_result = 1.0
@@ -186,8 +186,8 @@ for w in f4.read().split():
             print("Predicted: Positive / Actual: Negative")
         else:
             print("Predicted: Negative / Actual: Negative")
-            correct_guesses += 1
-        total_guesses += 1
+            correct_guesses_3 += 1
+        total_guesses_3 += 1
         # reset parameters
         review = []
         pos_result = 1.0
@@ -197,11 +197,18 @@ for w in f4.read().split():
 print("---------------")
 print("Final Result: ")
 print("---------------")
-print("Gaussian Naive Bayes classifier using BoW feature")
+print("Gaussian Naive Bayes classifier using BoW feature:")
+print("-Total Prediction: " + str(total_guesses_3))
+print("-Correct Prediction: " + str(correct_guesses_3))
+print("-Accuracy: " + str(correct_guesses_3 / total_guesses_3))
 print("---------------")
-print("Gaussian Naive Bayes classifier using TF-IDF feature")
+print("Gaussian Naive Bayes classifier using TF-IDF feature:")
+print("-Total Prediction: " + str(total_guesses_3))
+print("-Correct Prediction: " + str(correct_guesses_3))
+print("-Accuracy: " + str(correct_guesses_3 / total_guesses_3))
 print("---------------")
-print("Multinomial Naive Bayes classifier using BoW feature")
-print("Total Prediction: " + str(total_guesses))
-print("Correct Prediction: " + str(correct_guesses))
-print("Accuracy: " + str(correct_guesses / total_guesses))
+print("Multinomial Naive Bayes classifier using BoW feature:")
+print("-Total Prediction: " + str(total_guesses_3))
+print("-Correct Prediction: " + str(correct_guesses_3))
+print("-Accuracy: " + str(correct_guesses_3 / total_guesses_3))
+print("\n")
