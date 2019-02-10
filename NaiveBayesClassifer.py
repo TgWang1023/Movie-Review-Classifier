@@ -23,7 +23,13 @@ stop_words = {"a", "about", "above", "after", "again", "against", "all", "am", "
     "until", "up", "very", "was", "we", "we’d", "we’ll", "we’re", "we’ve", "were", "what", "what’s", "when", "when’s", "where", "where’s", "which", "while", "who", "who’s", 
     "whom", "why", "why’s", "with", "would", "you", "you’d", "you’ll", "you’re", "you’ve", "your", "yours", "yourself", "yourselves"}
 
-# multinomial naive bayes classifier
+# (1) gaussian naive bayes classifier using bow feature
+
+
+# (2) gaussian navie bayes classifier using tf-idf feature
+
+
+# (3) multinomial naive bayes classifier using bow feature
 # reading from positive training data
 pos_dict = {}
 total_pos_words = 0
