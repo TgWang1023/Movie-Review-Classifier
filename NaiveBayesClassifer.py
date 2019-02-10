@@ -39,14 +39,14 @@ for word in f2.read().split():
         total_neg_words += 1
 total_neg_words += 1
 
-# combining data from both sets
-total_dict = copy.deepcopy(pos_dict)
-total_words = total_pos_words + total_neg_words
-for word, count in neg_dict.items():
-    if word in total_dict:
-        total_dict[word] += count
-    else:
-        total_dict[word] = count
+# # combining data from both sets
+# total_dict = copy.deepcopy(pos_dict)
+# total_words = total_pos_words + total_neg_words
+# for word, count in neg_dict.items():
+#     if word in total_dict:
+#         total_dict[word] += count
+#     else:
+#         total_dict[word] = count
 
 # recording accuracy
 total_guesses = 0
@@ -161,6 +161,6 @@ for w in f4.read().split():
 # print final result
 print("---------------")
 print("Final Result: ")
-print("Total Guesses: " + str(total_guesses))
-print("Correct Guesses: " + str(correct_guesses))
+print("Total Prediction: " + str(total_guesses))
+print("Correct Prediction: " + str(correct_guesses))
 print("Accuracy: " + str(correct_guesses / total_guesses))
