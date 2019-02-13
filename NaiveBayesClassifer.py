@@ -27,6 +27,7 @@ stop_words = {"a", "about", "above", "after", "again", "against", "all", "am", "
     "until", "up", "very", "was", "we", "we’d", "we’ll", "we’re", "we’ve", "were", "what", "what’s", "when", "when’s", "where", "where’s", "which", "while", "who", "who’s", 
     "whom", "why", "why’s", "with", "would", "you", "you’d", "you’ll", "you’re", "you’ve", "your", "yours", "yourself", "yourselves"}
 
+print("Training data, please wait patiently...")
 # reading from positive training data
 pos_dict = {}
 total_pos_words = 0
@@ -79,10 +80,10 @@ for word, count in neg_dict.items():
 
 
 # (1) gaussian naive bayes classifier using bow feature
-f1.seek(0)
-f2.seek(0)
 # calculating mean vector and covariance matrix for positive reviews
-pos_total_vector = np.array([0] * len(total_dict))
+f1.seek(0)
+# mean vector portion
+pos_mean_vector = np.array([0] * len(total_dict))
 pos_current_dict = copy.deepcopy(total_dict)
 pos_review_count = 0
 for word in f1.read().split():
@@ -99,20 +100,51 @@ for word in f1.read().split():
             if word in pos_current_dict:
                 pos_current_dict[word] += 1
     else:
-        print(pos_review_count)
         pos_current_vector = np.array(list(pos_current_dict.values()))
-        pos_total_vector = np.add(pos_current_vector, pos_total_vector)
+        pos_mean_vector = pos_mean_vector + pos_current_vector
         pos_review_count += 1
         pos_current_dict = dict.fromkeys(pos_current_dict, 0)
 # add last review
 pos_current_vector = np.array(list(pos_current_dict.values()))
-pos_total_vector = np.add(pos_current_vector, pos_total_vector)
+pos_mean_vector = pos_current_vector + pos_mean_vector
 pos_review_count += 1
 # actual mean vector
-pos_mean_vector = pos_total_vector / pos_review_count
+pos_mean_vector = pos_mean_vector / pos_review_count
+# covariance matrix portion
+f1.seek(0)
+pos_current_dict = copy.deepcopy(total_dict)
+pos_cov_mtx = np.zeros(shape = (len(total_dict), len(total_dict)))
+for word in f1.read().split():
+    if word != "/><br":
+        if word not in stop_words:
+            if word[-3:] == "<br":
+                word = word[:-3]
+            if word[:2] == "/>":
+                word = word[2:]
+            if word[-1:] in marks:
+                word = word[:-1]
+            if word[:1] in marks:
+                word = word[1:]
+            if word in pos_current_dict:
+                pos_current_dict[word] += 1
+    else:
+        pos_current_vector = np.array(list(pos_current_dict.values()))
+        pos_diff_vector = pos_current_vector - pos_mean_vector
+        pos_trans_vector = np.transpose(pos_diff_vector)
+        pos_cov_mtx += pos_diff_vector * pos_trans_vector
+        pos_current_dict = dict.fromkeys(pos_current_dict, 0)
+# add last review
+pos_current_vector = np.array(list(pos_current_dict.values()))
+pos_diff_vector = pos_current_vector - pos_mean_vector
+pos_trans_vector = np.transpose(pos_diff_vector)
+pos_cov_mtx = pos_cov_mtx / pos_review_count
+print(pos_cov_mtx)
+
 
 # calculating mean vector and covariance matrix for negative reviews
-neg_total_vector = np.array([0] * len(total_dict))
+f2.seek(0)
+# mean vector portion
+neg_mean_vector = np.array([0] * len(total_dict))
 neg_current_dict = copy.deepcopy(total_dict)
 neg_review_count = 0
 for word in f2.read().split():
@@ -129,17 +161,46 @@ for word in f2.read().split():
             if word in neg_current_dict:
                 neg_current_dict[word] += 1
     else:
-        print(neg_review_count)
         neg_current_vector = np.array(list(neg_current_dict.values()))
-        neg_total_vector = np.add(neg_current_vector, neg_total_vector)
+        neg_mean_vector = np.add(neg_current_vector, neg_mean_vector)
         neg_review_count += 1
         neg_current_dict = dict.fromkeys(neg_current_dict, 0)
 # add last review
 neg_current_vector = np.array(list(neg_current_dict.values()))
-neg_total_vector = np.add(neg_current_vector, neg_total_vector)
+neg_mean_vector = np.add(neg_current_vector, neg_mean_vector)
 neg_review_count += 1
 # actual mean vector
-neg_mean_vector = neg_total_vector / neg_review_count
+neg_mean_vector = neg_mean_vector / neg_review_count
+# covariance matrix portion
+f2.seek(0)
+neg_current_dict = copy.deepcopy(total_dict)
+neg_cov_mtx = np.zeros(shape = (len(total_dict), len(total_dict)))
+for word in f1.read().split():
+    if word != "/><br":
+        if word not in stop_words:
+            if word[-3:] == "<br":
+                word = word[:-3]
+            if word[:2] == "/>":
+                word = word[2:]
+            if word[-1:] in marks:
+                word = word[:-1]
+            if word[:1] in marks:
+                word = word[1:]
+            if word in neg_current_dict:
+                neg_current_dict[word] += 1
+    else:
+        neg_current_vector = np.array(list(neg_current_dict.values()))
+        neg_diff_vector = neg_current_vector - neg_mean_vector
+        neg_trans_vector = np.transpose(neg_diff_vector)
+        neg_cov_mtx += neg_diff_vector * neg_trans_vector
+        neg_current_dict = dict.fromkeys(neg_current_dict, 0)
+# add last review
+neg_current_vector = np.array(list(neg_current_dict.values()))
+neg_diff_vector = neg_current_vector - neg_mean_vector
+neg_trans_vector = np.transpose(neg_diff_vector)
+neg_cov_mtx = neg_cov_mtx / neg_review_count
+print(neg_cov_mtx)
+
 
 # recording accuracy for (1)
 total_guesses_1 = 0
@@ -285,8 +346,8 @@ correct_guesses_1 = 0
 # print("-Accuracy: " + str(correct_guesses_3 / total_guesses_3))
 # print("\n")
 
-# # close files
-# f1.close()
-# f2.close()
-# f3.close()
-# f4.close()
+# close files
+f1.close()
+f2.close()
+f3.close()
+f4.close()
