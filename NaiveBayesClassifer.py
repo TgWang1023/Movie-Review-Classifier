@@ -1,11 +1,10 @@
 import sys
 import copy
 import math
-import re
 import numpy as np
 
 # setting print options for testing purposes
-np.set_printoptions(threshold = np.inf)
+# np.set_printoptions(threshold = np.inf)
 
 # check inputs and initlialize files
 if len(sys.argv) != 5:
@@ -16,12 +15,12 @@ f2 = open(sys.argv[2], 'r')
 f3 = open(sys.argv[3], 'r')
 f4 = open(sys.argv[4], 'r')
 
-# # common puncuation marks
-# marks = {",", ":", "'", ".", "-", "!", "?", ";", "(", ")"}
+# common puncuation marks
+marks = {",", ":", "'", ".", "-", "!", "?", ";", "(", ")"}
 # stop words
 stop_words = {"a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "as", "at", "be", "because", "been", "before", "being", 
     "below", "between", "both", "but", "by", "could", "did", "do", "does", "doing", "down", "during", "each", "few", "for", "from", "further", "had", "has", "have", 
-    "having", "he", "he'd", "he'll", "he's", "her", "here", "here's", "hers", "herself", "him", "himself", "his", "how", "how's", "I", "I'd", "I'll", "I'm", "I've", 
+    "having", "he", "he'd", "he'll", "he's", "her", "here", "here's", "hers", "herself", "him", "himself", "his", "how", "how's", "i", "i'd", "i'll", "i'm", "i've", 
     "if", "in", "into", "is", "it", "it's", "its", "itself", "let's", "me", "more", "most", "my", "myself", "nor", "of", "on", "once", "only", "or", "other", "ought", 
     "our", "ours", "ourselves", "out", "over", "own", "same", "she", "she'd", "she'll", "she's", "should", "so", "some", "such", "than", "that", "that's", "the", "their", 
     "theirs", "them", "themselves", "then", "there", "there's", "these", "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too", "under",
@@ -39,17 +38,19 @@ for word in f1.read().split():
             word = word[:-3]
         if word[:2] == "/>":
             word = word[2:]
-        word = re.sub(r'[,:.!?;()"]', '', word)
-        word = word.lower()
-        if word not in stop_words and len(word) > 1:
-            print(word)
-            if word in pos_dict:
-                pos_dict[word] += 1
-            else:
-                pos_dict[word] = 1
-            total_pos_words += 1
+        if word[-1:] in marks:
+            word = word[:-1]
+        if word[:1] in marks:
+            word = word[1:]
+        if word.isalpha():
+            word = word.lower()
+            if word not in stop_words:
+                if word in pos_dict:
+                    pos_dict[word] += 1
+                else:
+                    pos_dict[word] = 1
+                total_pos_words += 1
 total_pos_words += 1
-print(len(pos_dict))
 
 # reading from negative training data
 neg_dict = {}
@@ -61,16 +62,19 @@ for word in f2.read().split():
             word = word[:-3]
         if word[:2] == "/>":
             word = word[2:]
-        word = re.sub(r'[,:.!?;()"]', '', word)
-        word = word.lower()
-        if word not in stop_words and len(word) > 1:
-            if word in neg_dict:
-                neg_dict[word] += 1
-            else:
-                neg_dict[word] = 1
-            total_neg_words += 1
+        if word[-1:] in marks:
+            word = word[:-1]
+        if word[:1] in marks:
+            word = word[1:]
+        if word.isalpha():
+            word = word.lower()
+            if word not in stop_words:
+                if word in neg_dict:
+                    neg_dict[word] += 1
+                else:
+                    neg_dict[word] = 1
+                total_neg_words += 1
 total_neg_words += 1
-print(len(neg_dict))
 
 # combining data from both sets
 total_dict = copy.deepcopy(pos_dict)
@@ -79,7 +83,7 @@ total_words = total_pos_words + total_neg_words
 for word, count in neg_dict.items():
     if word not in total_dict:
         total_dict[word] = 0
-print(len(total_dict))
+
 
 # # (1) gaussian naive bayes classifier using bow feature
 # # calculating mean vector and covariance matrix for positive reviews
@@ -90,13 +94,16 @@ print(len(total_dict))
 # pos_review_count = 0
 # for word in f1.read().split():
 #     if word != "/><br":
+#         if word not in stop_words:
 #             if word[-3:] == "<br":
 #                 word = word[:-3]
 #             if word[:2] == "/>":
 #                 word = word[2:]
-#             word = re.sub(r'[,:.!?;()"]', '', word)
-#             word = word.lower()
-#             if word in pos_current_dict and not in stop_words and len(word) > 1:
+#             if word[-1:] in marks:
+#                 word = word[:-1]
+#             if word[:1] in marks:
+#                 word = word[1:]
+#             if word in pos_current_dict:
 #                 pos_current_dict[word] += 1
 #     else:
 #         pos_current_vector = np.array(list(pos_current_dict.values()))
@@ -109,19 +116,23 @@ print(len(total_dict))
 # pos_review_count += 1
 # # actual mean vector
 # pos_mean_vector = pos_mean_vector / pos_review_count
+# print(pos_mean_vector)
 # # covariance matrix portion
 # f1.seek(0)
 # pos_current_dict = copy.deepcopy(total_dict)
 # pos_cov_mtx = np.zeros(shape = (len(total_dict), len(total_dict)))
 # for word in f1.read().split():
 #     if word != "/><br":
+#         if word not in stop_words:
 #             if word[-3:] == "<br":
 #                 word = word[:-3]
 #             if word[:2] == "/>":
 #                 word = word[2:]
-#             word = re.sub(r'[,:.!?;()"]', '', word)
-#             word = word.lower()
-#             if word in pos_current_dict and not in stop_words and len(word) > 1:
+#             if word[-1:] in marks:
+#                 word = word[:-1]
+#             if word[:1] in marks:
+#                 word = word[1:]
+#             if word in pos_current_dict:
 #                 pos_current_dict[word] += 1
 #     else:
 #         pos_current_vector = np.array(list(pos_current_dict.values()))
@@ -145,13 +156,16 @@ print(len(total_dict))
 # neg_review_count = 0
 # for word in f2.read().split():
 #     if word != "/><br":
+#         if word not in stop_words:
 #             if word[-3:] == "<br":
 #                 word = word[:-3]
 #             if word[:2] == "/>":
 #                 word = word[2:]
-#             word = re.sub(r'[,:.!?;()"]', '', word)
-#             word = word.lower()
-#             if word in neg_current_dict and not in stop_words and len(word) > 1:
+#             if word[-1:] in marks:
+#                 word = word[:-1]
+#             if word[:1] in marks:
+#                 word = word[1:]
+#             if word in neg_current_dict:
 #                 neg_current_dict[word] += 1
 #     else:
 #         neg_current_vector = np.array(list(neg_current_dict.values()))
@@ -170,13 +184,16 @@ print(len(total_dict))
 # neg_cov_mtx = np.zeros(shape = (len(total_dict), len(total_dict)))
 # for word in f1.read().split():
 #     if word != "/><br":
+#         if word not in stop_words:
 #             if word[-3:] == "<br":
 #                 word = word[:-3]
 #             if word[:2] == "/>":
 #                 word = word[2:]
-#             word = re.sub(r'[,:.!?;()"]', '', word)
-#             word = word.lower()
-#             if word in neg_current_dict and not in stop_words and len(word) > 1:
+#             if word[-1:] in marks:
+#                 word = word[:-1]
+#             if word[:1] in marks:
+#                 word = word[1:]
+#             if word in neg_current_dict:
 #                 neg_current_dict[word] += 1
 #     else:
 #         neg_current_vector = np.array(list(neg_current_dict.values()))
@@ -192,9 +209,9 @@ print(len(total_dict))
 # print(neg_cov_mtx)
 
 
-# # recording accuracy for (1)
-# total_guesses_1 = 0
-# correct_guesses_1 = 0
+# recording accuracy for (1)
+total_guesses_1 = 0
+correct_guesses_1 = 0
 
 
 
@@ -219,10 +236,14 @@ for w in f3.read().split():
             w = w[:-3]
         if w[:2] == "/>":
             w = w[2:]
-        re.sub(r'[,:.!?;()"]', '', w)
-        w = w.lower()
-        if w not in stop_words and len(w) > 1:
-            review.append(w)
+        if w[-1:] in marks:
+            w = w[:-1]
+        if w[:1] in marks:
+            w = w[1:]
+        if w.isalpha():
+            w = w.lower()
+            if w not in stop_words:
+                review.append(w)
     else:
         for word in review:
             if word in pos_dict:
@@ -248,13 +269,12 @@ for w in f3.read().split():
                 else:
                     # laplace smoothing
                     neg_result = neg_result + math.log10(1 / (total_neg_words + len(total_dict)))
-        # print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
+        print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
         if pos_result >= neg_result:
-            # print("Predicted: Positive / Actual: Positive")
+            print("Predicted: Positive / Actual: Positive")
             correct_guesses_3 += 1
         else:
-            # print("Predicted: Negative / Actual: Positive")
-            pass
+            print("Predicted: Negative / Actual: Positive")
         total_guesses_3 += 1
         # reset parameters
         review = []
@@ -272,10 +292,14 @@ for w in f4.read().split():
             w = w[:-3]
         if w[:2] == "/>":
             w = w[2:]
-        re.sub(r'[,:.!?;()"]', '', w)
-        w = w.lower()
-        if w not in stop_words and len(w) > 1:
-            review.append(w)
+        if w[-1:] in marks:
+            w = w[:-1]
+        if w[:1] in marks:
+            w = w[1:]
+        if w.isalpha():
+            w = w.lower()
+            if w not in stop_words:
+                review.append(w)
     else:
         for word in review:
             if word in pos_dict:
@@ -301,12 +325,11 @@ for w in f4.read().split():
                 else:
                     # laplace smoothing
                     neg_result = neg_result + math.log10(1 / (total_neg_words + len(total_dict)))
-        # print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
+        print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
         if pos_result >= neg_result:
-            # print("Predicted: Positive / Actual: Negative")
-            pass
+            print("Predicted: Positive / Actual: Negative")
         else:
-            # print("Predicted: Negative / Actual: Negative")
+            print("Predicted: Negative / Actual: Negative")
             correct_guesses_3 += 1
         total_guesses_3 += 1
         # reset parameters
