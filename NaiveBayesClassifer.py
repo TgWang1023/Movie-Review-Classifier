@@ -2,6 +2,7 @@ import sys
 import copy
 import math
 import numpy as np
+import scipy.stats as sp
 
 # setting print options for testing purposes
 # np.set_printoptions(threshold = np.inf)
@@ -90,8 +91,8 @@ for word, count in neg_dict.items():
 # calculating mean vector and variance vector for positive reviews
 f1.seek(0)
 # mean vector portion
-pos_mean_vector = np.array([0.0] * len(total_dict))
-pos_current_dict = copy.deepcopy(total_dict)
+pos_mean_vector = copy.deepcopy(total_dict)
+pos_mean_vector = dict.fromkeys(pos_mean_vector, 0)
 pos_review_count = 0
 for word in f1.read().split():
     if word != "/><br":
@@ -104,25 +105,22 @@ for word in f1.read().split():
                 word = word[:-1]
             if word[:1] in marks:
                 word = word[1:]
-            if word in pos_current_dict:
-                pos_current_dict[word] += 1
+            if word in pos_dict:
+                pos_mean_vector[word] += 1
     else:
-        pos_current_vector = np.array(list(pos_current_dict.values()))
-        pos_mean_vector = pos_mean_vector + pos_current_vector
         pos_review_count += 1
-        pos_current_dict = dict.fromkeys(pos_current_dict, 0)
 # add last review
-pos_current_vector = np.array(list(pos_current_dict.values()))
-pos_mean_vector = pos_current_vector + pos_mean_vector
 pos_review_count += 1
 # actual mean vector
-pos_mean_vector = pos_mean_vector / pos_review_count
+for word in pos_mean_vector:
+    pos_mean_vector[word] = pos_mean_vector[word] / pos_review_count
 print("Pos Mean Vector:")
 print(pos_mean_vector)
 # variance vector portion
 f1.seek(0)
-pos_current_dict = copy.deepcopy(total_dict)
-pos_variance_vector = np.array([0.0] * len(total_dict))
+pos_variance_vector = copy.deepcopy(total_dict)
+pos_variance_vector = dict.fromkeys(pos_variance_vector, 0)
+pos_curr_vector = copy.deepcopy(pos_variance_vector)
 for word in f1.read().split():
     if word != "/><br":
         if word not in stop_words:
@@ -134,28 +132,25 @@ for word in f1.read().split():
                 word = word[:-1]
             if word[:1] in marks:
                 word = word[1:]
-            if word in pos_current_dict:
-                pos_current_dict[word] += 1
+            pos_curr_vector[word] += 1
     else:
-        pos_current_vector = np.array(list(pos_current_dict.values()))
-        pos_diff_vector = pos_current_vector - pos_mean_vector
-        pos_variance_vector += np.square(pos_diff_vector)
-        pos_current_dict = dict.fromkeys(pos_current_dict, 0)
+        for w in pos_curr_vector:
+            pos_variance_vector[w] += ((pos_curr_vector[w] - pos_mean_vector[w]) ** 2)
+        pos_curr_vector = dict.fromkeys(pos_curr_vector, 0)
 # add last review
-pos_current_vector = np.array(list(pos_current_dict.values()))
-pos_diff_vector = pos_current_vector - pos_mean_vector
-pos_variance_vector += np.square(pos_diff_vector)
-pos_current_dict = dict.fromkeys(pos_current_dict, 0)
+for word in pos_curr_vector:
+    pos_variance_vector[word] += ((pos_curr_vector[word] - pos_mean_vector[word]) ** 2)
 # actual variance vector
-pos_variance_vector = pos_variance_vector / pos_review_count
+for word in pos_variance_vector:
+    pos_variance_vector[word] = pos_variance_vector[word] / pos_review_count
 print("Pos Variance Vector:")
 print(pos_variance_vector)
 
 # calculating mean vector and variance vector for negative reviews
 f2.seek(0)
 # mean vector portion
-neg_mean_vector = np.array([0.0] * len(total_dict))
-neg_current_dict = copy.deepcopy(total_dict)
+neg_mean_vector = copy.deepcopy(total_dict)
+neg_mean_vector = dict.fromkeys(neg_mean_vector, 0)
 neg_review_count = 0
 for word in f2.read().split():
     if word != "/><br":
@@ -168,25 +163,22 @@ for word in f2.read().split():
                 word = word[:-1]
             if word[:1] in marks:
                 word = word[1:]
-            if word in neg_current_dict:
-                neg_current_dict[word] += 1
+            if word in neg_dict:
+                neg_mean_vector[word] += 1
     else:
-        neg_current_vector = np.array(list(neg_current_dict.values()))
-        neg_mean_vector = neg_current_vector + neg_mean_vector
         neg_review_count += 1
-        neg_current_dict = dict.fromkeys(neg_current_dict, 0)
 # add last review
-neg_current_vector = np.array(list(neg_current_dict.values()))
-neg_mean_vector = neg_current_vector + neg_mean_vector
 neg_review_count += 1
 # actual mean vector
-neg_mean_vector = neg_mean_vector / neg_review_count
+for word in neg_mean_vector:
+    neg_mean_vector[word] = neg_mean_vector[word] / neg_review_count
 print("Neg Mean Vector:")
 print(neg_mean_vector)
 # variance vector portion
 f2.seek(0)
-neg_current_dict = copy.deepcopy(total_dict)
-neg_variance_vector = np.array([0.0] * len(total_dict))
+neg_variance_vector = copy.deepcopy(total_dict)
+neg_variance_vector = dict.fromkeys(neg_variance_vector, 0)
+neg_curr_vector = copy.deepcopy(neg_variance_vector)
 for word in f2.read().split():
     if word != "/><br":
         if word not in stop_words:
@@ -198,20 +190,17 @@ for word in f2.read().split():
                 word = word[:-1]
             if word[:1] in marks:
                 word = word[1:]
-            if word in neg_current_dict:
-                neg_current_dict[word] += 1
+            neg_curr_vector[word] += 1
     else:
-        neg_current_vector = np.array(list(neg_current_dict.values()))
-        neg_diff_vector = neg_current_vector - neg_mean_vector
-        neg_variance_vector += np.square(neg_diff_vector)
-        neg_current_dict = dict.fromkeys(neg_current_dict, 0)
+        for w in neg_curr_vector:
+            neg_variance_vector[w] += ((neg_curr_vector[w] - neg_mean_vector[w]) ** 2)
+        neg_curr_vector = dict.fromkeys(neg_curr_vector, 0)
 # add last review
-neg_current_vector = np.array(list(neg_current_dict.values()))
-neg_diff_vector = neg_current_vector - neg_mean_vector
-neg_variance_vector += np.square(neg_diff_vector)
-neg_current_dict = dict.fromkeys(neg_current_dict, 0)
+for word in neg_curr_vector:
+    neg_variance_vector[word] += ((neg_curr_vector[word] - neg_mean_vector[word]) ** 2)
 # actual variance vector
-neg_variance_vector = neg_variance_vector / neg_review_count
+for word in neg_variance_vector:
+    neg_variance_vector[word] = neg_variance_vector[word] / neg_review_count
 print("Neg Variance Vector:")
 print(neg_variance_vector)
 
@@ -220,7 +209,86 @@ total_guesses_1 = 0
 correct_guesses_1 = 0
 
 # reading from positive test data
+review = {}
+pos_result = 1.0
+neg_result = 1.0
+for w in f3.read().split():
+    # print(w)
+    if w != "/><br":
+        if w[-3:] == "<br":
+            w = w[:-3]
+        if w[:2] == "/>":
+            w = w[2:]
+        if w[-1:] in marks:
+            w = w[:-1]
+        if w[:1] in marks:
+            w = w[1:]
+        if w.isalpha():
+            w = w.lower()
+            if w not in stop_words:
+                if w not in review:
+                    review[w] = 1
+                else:
+                    review[w] += 1
+    else:
+        for word, occur in review.items():
+            pos_mean = pos_mean_vector[word]
+            pos_var = pos_variance_vector[word]
+            neg_mean = neg_mean_vector[word]
+            neg_var = neg_variance_vector[word]
+            pos_result *= sp.norm(pos_mean, pos_var).pdf(occur)
+            neg_result *= sp.norm(neg_mean, neg_var).pdf(occur)
+        if pos_result >= neg_result:
+            print("Predicted: Positive / Actual: Positive")
+            correct_guesses_1 += 1
+        else:
+            print("Predicted: Negative / Actual: Positve")
+        total_guesses_1 += 1
+        # reset parameters
+        review = {}
+        pos_result = 1.0
+        neg_result = 1.0
 
+# reading from negative test data
+review = {}
+pos_result = 1.0
+neg_result = 1.0
+for w in f4.read().split():
+    # print(w)
+    if w != "/><br":
+        if w[-3:] == "<br":
+            w = w[:-3]
+        if w[:2] == "/>":
+            w = w[2:]
+        if w[-1:] in marks:
+            w = w[:-1]
+        if w[:1] in marks:
+            w = w[1:]
+        if w.isalpha():
+            w = w.lower()
+            if w not in stop_words:
+                if w not in review:
+                    review[w] = 1
+                else:
+                    review[w] += 1
+    else:
+        for word, occur in review:
+            pos_mean = pos_mean_vector[word]
+            pos_var = pos_variance_vector[word]
+            neg_mean = neg_mean_vector[word]
+            neg_var = neg_variance_vector[word]
+            pos_result *= sp.norm(pos_mean, pos_var).pdf(occur)
+            neg_result *= sp.norm(neg_mean, neg_var).pdf(occur)
+        if pos_result >= neg_result:
+            print("Predicted: Positive / Actual: Negative")
+        else:
+            print("Predicted: Negative / Actual: Negative")
+            correct_guesses_1 += 1
+        total_guesses_1 += 1
+        # reset parameters
+        review = {}
+        pos_result = 1.0
+        neg_result = 1.0
 
 
 # # (2) gaussian naive bayes classifier using tf-idf feature
@@ -228,144 +296,146 @@ correct_guesses_1 = 0
 # total_guesses_2 = 0
 # correct_guesses_2 = 0
 
-# # (3) multinomial naive bayes classifier using bow feature
-# # recording accuracy for (3)
-# total_guesses_3 = 0
-# correct_guesses_3 = 0
+# (3) multinomial naive bayes classifier using bow feature
+# recording accuracy for (3)
+total_guesses_3 = 0
+correct_guesses_3 = 0
 
-# # reading from positive test data
-# review = []
-# pos_result = 1.0
-# neg_result = 1.0
-# for w in f3.read().split():
-#     # print(w)
-#     if w != "/><br":
-#         if w[-3:] == "<br":
-#             w = w[:-3]
-#         if w[:2] == "/>":
-#             w = w[2:]
-#         if w[-1:] in marks:
-#             w = w[:-1]
-#         if w[:1] in marks:
-#             w = w[1:]
-#         if w.isalpha():
-#             w = w.lower()
-#             if w not in stop_words:
-#                 review.append(w)
-#     else:
-#         for word in review:
-#             if word in pos_dict:
-#                 pos_result = pos_result * ((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
-#             else:
-#                 # laplace smoothing
-#                 pos_result = pos_result * (1 / (total_pos_words + len(total_dict)))
-#             if word in neg_dict:
-#                 neg_result = neg_result * ((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
-#             else:
-#                 # laplace smoothing
-#                 neg_result = neg_result * (1 / (total_neg_words + len(total_dict)))
-#         # result underflows
-#         if pos_result == 0 and neg_result == 0:
-#             for word in review:
-#                 if word in pos_dict:
-#                     pos_result = pos_result + math.log10((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
-#                 else:
-#                     # laplace smoothing
-#                     pos_result = pos_result + math.log10(1 / (total_pos_words + len(total_dict)))
-#                 if word in neg_dict:
-#                     neg_result = neg_result + math.log10((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
-#                 else:
-#                     # laplace smoothing
-#                     neg_result = neg_result + math.log10(1 / (total_neg_words + len(total_dict)))
-#         # print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
-#         if pos_result >= neg_result:
-#             # print("Predicted: Positive / Actual: Positive")
-#             correct_guesses_3 += 1
-#         else:
-#             # print("Predicted: Negative / Actual: Positive")
-#             pass
-#         total_guesses_3 += 1
-#         # reset parameters
-#         review = []
-#         pos_result = 1.0
-#         neg_result = 1.0
+# reading from positive test data
+f3.seek(0)
+review = []
+pos_result = 1.0
+neg_result = 1.0
+for w in f3.read().split():
+    # print(w)
+    if w != "/><br":
+        if w[-3:] == "<br":
+            w = w[:-3]
+        if w[:2] == "/>":
+            w = w[2:]
+        if w[-1:] in marks:
+            w = w[:-1]
+        if w[:1] in marks:
+            w = w[1:]
+        if w.isalpha():
+            w = w.lower()
+            if w not in stop_words:
+                review.append(w)
+    else:
+        for word in review:
+            if word in pos_dict:
+                pos_result = pos_result * ((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
+            else:
+                # laplace smoothing
+                pos_result = pos_result * (1 / (total_pos_words + len(total_dict)))
+            if word in neg_dict:
+                neg_result = neg_result * ((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
+            else:
+                # laplace smoothing
+                neg_result = neg_result * (1 / (total_neg_words + len(total_dict)))
+        # result underflows
+        if pos_result == 0 and neg_result == 0:
+            for word in review:
+                if word in pos_dict:
+                    pos_result = pos_result + math.log10((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
+                else:
+                    # laplace smoothing
+                    pos_result = pos_result + math.log10(1 / (total_pos_words + len(total_dict)))
+                if word in neg_dict:
+                    neg_result = neg_result + math.log10((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
+                else:
+                    # laplace smoothing
+                    neg_result = neg_result + math.log10(1 / (total_neg_words + len(total_dict)))
+        # print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
+        if pos_result >= neg_result:
+            # print("Predicted: Positive / Actual: Positive")
+            correct_guesses_3 += 1
+        else:
+            # print("Predicted: Negative / Actual: Positive")
+            pass
+        total_guesses_3 += 1
+        # reset parameters
+        review = []
+        pos_result = 1.0
+        neg_result = 1.0
 
-# # reading from negative test data
-# review = []
-# pos_result = 1.0
-# neg_result = 1.0
-# for w in f4.read().split():
-#     # print(w)
-#     if w != "/><br":
-#         if w[-3:] == "<br":
-#             w = w[:-3]
-#         if w[:2] == "/>":
-#             w = w[2:]
-#         if w[-1:] in marks:
-#             w = w[:-1]
-#         if w[:1] in marks:
-#             w = w[1:]
-#         if w.isalpha():
-#             w = w.lower()
-#             if w not in stop_words:
-#                 review.append(w)
-#     else:
-#         for word in review:
-#             if word in pos_dict:
-#                 pos_result = pos_result * ((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
-#             else:
-#                 # laplace smoothing
-#                 pos_result = pos_result * (1 / (total_pos_words + len(total_dict)))
-#             if word in neg_dict:
-#                 neg_result = neg_result * ((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
-#             else:
-#                 # laplace smoothing
-#                 neg_result = neg_result * (1 / (total_neg_words + len(total_dict)))
-#         # result underflows
-#         if pos_result == 0.0 and neg_result == 0.0:
-#             for word in review:
-#                 if word in pos_dict:
-#                     pos_result = pos_result + math.log10((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
-#                 else:
-#                     # laplace smoothing
-#                     pos_result = pos_result + math.log10(1 / (total_pos_words + len(total_dict)))
-#                 if word in neg_dict:
-#                     neg_result = neg_result + math.log10((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
-#                 else:
-#                     # laplace smoothing
-#                     neg_result = neg_result + math.log10(1 / (total_neg_words + len(total_dict)))
-#         # print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
-#         if pos_result >= neg_result:
-#             # print("Predicted: Positive / Actual: Negative")
-#             pass
-#         else:
-#             # print("Predicted: Negative / Actual: Negative")
-#             correct_guesses_3 += 1
-#         total_guesses_3 += 1
-#         # reset parameters
-#         review = []
-#         pos_result = 1.0
-#         neg_result = 1.0
+# reading from negative test data
+f4.seek(0)
+review = []
+pos_result = 1.0
+neg_result = 1.0
+for w in f4.read().split():
+    # print(w)
+    if w != "/><br":
+        if w[-3:] == "<br":
+            w = w[:-3]
+        if w[:2] == "/>":
+            w = w[2:]
+        if w[-1:] in marks:
+            w = w[:-1]
+        if w[:1] in marks:
+            w = w[1:]
+        if w.isalpha():
+            w = w.lower()
+            if w not in stop_words:
+                review.append(w)
+    else:
+        for word in review:
+            if word in pos_dict:
+                pos_result = pos_result * ((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
+            else:
+                # laplace smoothing
+                pos_result = pos_result * (1 / (total_pos_words + len(total_dict)))
+            if word in neg_dict:
+                neg_result = neg_result * ((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
+            else:
+                # laplace smoothing
+                neg_result = neg_result * (1 / (total_neg_words + len(total_dict)))
+        # result underflows
+        if pos_result == 0.0 and neg_result == 0.0:
+            for word in review:
+                if word in pos_dict:
+                    pos_result = pos_result + math.log10((pos_dict[word] + 1) / (total_pos_words + len(total_dict)))
+                else:
+                    # laplace smoothing
+                    pos_result = pos_result + math.log10(1 / (total_pos_words + len(total_dict)))
+                if word in neg_dict:
+                    neg_result = neg_result + math.log10((neg_dict[word] + 1) / (total_neg_words + len(total_dict)))
+                else:
+                    # laplace smoothing
+                    neg_result = neg_result + math.log10(1 / (total_neg_words + len(total_dict)))
+        # print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
+        if pos_result >= neg_result:
+            # print("Predicted: Positive / Actual: Negative")
+            pass
+        else:
+            # print("Predicted: Negative / Actual: Negative")
+            correct_guesses_3 += 1
+        total_guesses_3 += 1
+        # reset parameters
+        review = []
+        pos_result = 1.0
+        neg_result = 1.0
 
-# # print final result
-# print("---------------")
-# print("Final Result: ")
-# print("---------------")
-# print("Gaussian Naive Bayes classifier using BoW feature:")
-# print("-Total Prediction: " + str(total_guesses_3))
-# print("-Correct Prediction: " + str(correct_guesses_3))
-# print("-Accuracy: " + str(correct_guesses_3 / total_guesses_3))
-# print("---------------")
-# print("Gaussian Naive Bayes classifier using TF-IDF feature:")
-# print("-Total Prediction: " + str(total_guesses_3))
-# print("-Correct Prediction: " + str(correct_guesses_3))
-# print("-Accuracy: " + str(correct_guesses_3 / total_guesses_3))
-# print("---------------")
-# print("Multinomial Naive Bayes classifier using BoW feature:")
-# print("-Total Prediction: " + str(total_guesses_3))
-# print("-Correct Prediction: " + str(correct_guesses_3))
-# print("-Accuracy: " + str(correct_guesses_3 / total_guesses_3))
-# print("\n")
+# print final result
+print("---------------")
+print("Final Result: ")
+print("---------------")
+print("Gaussian Naive Bayes classifier using BoW feature:")
+print("-Total Prediction: " + str(total_guesses_1))
+print("-Correct Prediction: " + str(correct_guesses_1))
+print("-Accuracy: " + str(correct_guesses_1 / total_guesses_1))
+print("---------------")
+print("Gaussian Naive Bayes classifier using TF-IDF feature:")
+print("-Total Prediction: " + str(total_guesses_3))
+print("-Correct Prediction: " + str(correct_guesses_3))
+print("-Accuracy: " + str(correct_guesses_3 / total_guesses_3))
+print("---------------")
+print("Multinomial Naive Bayes classifier using BoW feature:")
+print("-Total Prediction: " + str(total_guesses_3))
+print("-Correct Prediction: " + str(correct_guesses_3))
+print("-Accuracy: " + str(correct_guesses_3 / total_guesses_3))
+print("\n")
 
 # close files
 f1.close()
