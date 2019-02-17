@@ -106,7 +106,8 @@ for word in f1.read().split():
             if word[:1] in marks:
                 word = word[1:]
             word = word.lower()
-            pos_mean_vector[word] += 1
+            if word in pos_mean_vector:
+                pos_mean_vector[word] += 1
     else:
         pos_review_count += 1
 # add last review
@@ -131,7 +132,8 @@ for word in f1.read().split():
             if word[:1] in marks:
                 word = word[1:]
             word = word.lower()
-            pos_curr_vector[word] += 1
+            if word in pos_variance_vector:
+                pos_curr_vector[word] += 1
     else:
         for w in pos_curr_vector:
             pos_variance_vector[w] += ((pos_curr_vector[w] - pos_mean_vector[w]) ** 2)
@@ -161,7 +163,8 @@ for word in f2.read().split():
             if word[:1] in marks:
                 word = word[1:]
             word = word.lower()
-            neg_mean_vector[word] += 1
+            if word in neg_mean_vector:
+                neg_mean_vector[word] += 1
     else:
         neg_review_count += 1
 # add last review
@@ -186,7 +189,8 @@ for word in f2.read().split():
             if word[:1] in marks:
                 word = word[1:]
             word = word.lower()
-            neg_curr_vector[word] += 1
+            if word in neg_variance_vector:
+                neg_curr_vector[word] += 1
     else:
         for w in neg_curr_vector:
             neg_variance_vector[w] += ((neg_curr_vector[w] - neg_mean_vector[w]) ** 2)
@@ -228,12 +232,33 @@ for w in f3.read().split():
         for word, occur in review.items():
             if word in pos_mean_vector:
                 pos_mean = pos_mean_vector[word]
-                pos_var = pos_variance_vector[word]    
-                pos_result *= sp.norm(pos_mean, pos_var).pdf(occur)
+                pos_var = pos_variance_vector[word]  
+                denom = (2 * math.pi * pos_var) ** 0.5
+                num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
+                pos_result *= (num / denom)
             if word in neg_mean_vector:
                 neg_mean = neg_mean_vector[word]
                 neg_var = neg_variance_vector[word]
-                neg_result *= sp.norm(neg_mean, neg_var).pdf(occur) 
+                denom = (2 * math.pi * neg_var) ** 0.5
+                num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
+                neg_result *= (num / denom)
+        if pos_result == 0.0 and neg_result == 0.0:
+            for word, occur in review.items():
+                if word in pos_mean_vector:
+                    pos_mean = pos_mean_vector[word]
+                    pos_var = pos_variance_vector[word]  
+                    denom = (2 * math.pi * pos_var) ** 0.5
+                    num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
+                    if num / denom != 0:
+                        pos_result += math.log10(num / denom)
+                if word in neg_mean_vector:
+                    neg_mean = neg_mean_vector[word]
+                    neg_var = neg_variance_vector[word]
+                    denom = (2 * math.pi * neg_var) ** 0.5
+                    num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
+                    if num / denom != 0:
+                        neg_result += math.log10(num / denom)
+        print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result)) 
         if pos_result >= neg_result:
             print("Predicted: Positive / Actual: Positive")
             correct_guesses_1 += 1
@@ -268,15 +293,36 @@ for w in f4.read().split():
                 else:
                     review[w] += 1
     else:
-        for word, occur in review:
+        for word, occur in review.items():
             if word in pos_mean_vector:
                 pos_mean = pos_mean_vector[word]
-                pos_var = pos_variance_vector[word]
-                pos_result *= sp.norm(pos_mean, pos_var).pdf(occur)
+                pos_var = pos_variance_vector[word]  
+                denom = (2 * math.pi * pos_var) ** 0.5
+                num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
+                pos_result *= (num / denom)
             if word in neg_mean_vector:
                 neg_mean = neg_mean_vector[word]
                 neg_var = neg_variance_vector[word]
-                neg_result *= sp.norm(neg_mean, neg_var).pdf(occur) 
+                denom = (2 * math.pi * neg_var) ** 0.5
+                num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
+                neg_result *= (num / denom)
+        if pos_result == 0.0 and neg_result == 0.0:
+            for word, occur in review.items():
+                if word in pos_mean_vector:
+                    pos_mean = pos_mean_vector[word]
+                    pos_var = pos_variance_vector[word]  
+                    denom = (2 * math.pi * pos_var) ** 0.5
+                    num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
+                    if num / denom != 0:
+                        pos_result += math.log10(num / denom)
+                if word in neg_mean_vector:
+                    neg_mean = neg_mean_vector[word]
+                    neg_var = neg_variance_vector[word]
+                    denom = (2 * math.pi * neg_var) ** 0.5
+                    num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
+                    if num / denom != 0:
+                        neg_result += math.log10(num / denom)
+        print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
         if pos_result >= neg_result:
             print("Predicted: Positive / Actual: Negative")
         else:
