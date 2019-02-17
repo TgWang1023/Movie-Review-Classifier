@@ -32,8 +32,9 @@ stop_words = {"a", "about", "above", "after", "again", "against", "all", "am", "
 print("Training data, please wait patiently...")
 # reading from positive training data
 pos_dict = {}
+review = {}
+pos_word_in_review_vector = {}
 total_pos_words = 0
-total_pos_review = 0
 for word in f1.read().split():
     # print(word)
     if word != "/><br":
@@ -52,16 +53,22 @@ for word in f1.read().split():
                     pos_dict[word] += 1
                 else:
                     pos_dict[word] = 1
+                if word not in review:
+                    review[word] += 1
                 total_pos_words += 1
     else:
-        total_pos_review += 1
-total_pos_review += 1
+        for w in review:
+            if w in pos_word_in_review_vector:
+                pos_word_in_review_vector[w] += 1
+            else:
+                pos_word_in_review_vector[w] = 1
 total_pos_words += 1
 
 # reading from negative training data
 neg_dict = {}
+review = {}
+neg_word_in_review_vector = {}
 total_neg_words = 0
-total_neg_review = 0
 for word in f2.read().split():
     # print(word)
     if word != "/><br":
@@ -80,10 +87,15 @@ for word in f2.read().split():
                     neg_dict[word] += 1
                 else:
                     neg_dict[word] = 1
+                if word not in review:
+                    review[word] += 1
                 total_neg_words += 1
     else:
-        total_neg_review += 1
-total_neg_review += 1
+        for w in review:
+            if w in neg_word_in_review_vector:
+                neg_word_in_review_vector[w] += 1
+            else:
+                neg_word_in_review_vector[w] = 1
 total_neg_words += 1
 
 # combining data from both sets
@@ -97,256 +109,6 @@ for word, count in neg_dict.items():
 
 # (1) gaussian naive bayes classifier using bow feature
 # calculating mean vector and variance vector for positive reviews
-# f1.seek(0)
-# # mean vector portion
-# pos_mean_vector = copy.deepcopy(pos_dict)
-# pos_mean_vector = dict.fromkeys(pos_mean_vector, 0)
-# pos_review_count = 0
-# for word in f1.read().split():
-#     if word != "/><br":
-#         if word not in stop_words:
-#             if word[-3:] == "<br":
-#                 word = word[:-3]
-#             if word[:2] == "/>":
-#                 word = word[2:]
-#             if word[-1:] in marks:
-#                 word = word[:-1]
-#             if word[:1] in marks:
-#                 word = word[1:]
-#             word = word.lower()
-#             if word in pos_mean_vector:
-#                 pos_mean_vector[word] += 1
-#     else:
-#         pos_review_count += 1
-# # add last review
-# pos_review_count += 1
-# # actual mean vector
-# for word in pos_mean_vector:
-#     pos_mean_vector[word] = pos_mean_vector[word] / pos_review_count
-# # variance vector portion
-# f1.seek(0)
-# pos_variance_vector = copy.deepcopy(pos_dict)
-# pos_variance_vector = dict.fromkeys(pos_variance_vector, 0)
-# pos_curr_vector = copy.deepcopy(pos_variance_vector)
-# for word in f1.read().split():
-#     if word != "/><br":
-#         if word not in stop_words:
-#             if word[-3:] == "<br":
-#                 word = word[:-3]
-#             if word[:2] == "/>":
-#                 word = word[2:]
-#             if word[-1:] in marks:
-#                 word = word[:-1]
-#             if word[:1] in marks:
-#                 word = word[1:]
-#             word = word.lower()
-#             if word in pos_variance_vector:
-#                 pos_curr_vector[word] += 1
-#     else:
-#         for w in pos_curr_vector:
-#             pos_variance_vector[w] += ((pos_curr_vector[w] - pos_mean_vector[w]) ** 2)
-#         pos_curr_vector = dict.fromkeys(pos_curr_vector, 0)
-# # add last review
-# for word in pos_curr_vector:
-#     pos_variance_vector[word] += ((pos_curr_vector[word] - pos_mean_vector[word]) ** 2)
-# # actual variance vector
-# for word in pos_variance_vector:
-#     pos_variance_vector[word] = pos_variance_vector[word] / pos_review_count
-
-# # calculating mean vector and variance vector for negative reviews
-# f2.seek(0)
-# # mean vector portion
-# neg_mean_vector = copy.deepcopy(neg_dict)
-# neg_mean_vector = dict.fromkeys(neg_mean_vector, 0)
-# neg_review_count = 0
-# for word in f2.read().split():
-#     if word != "/><br":
-#         if word not in stop_words:
-#             if word[-3:] == "<br":
-#                 word = word[:-3]
-#             if word[:2] == "/>":
-#                 word = word[2:]
-#             if word[-1:] in marks:
-#                 word = word[:-1]
-#             if word[:1] in marks:
-#                 word = word[1:]
-#             word = word.lower()
-#             if word in neg_mean_vector:
-#                 neg_mean_vector[word] += 1
-#     else:
-#         neg_review_count += 1
-# # add last review
-# neg_review_count += 1
-# # actual mean vector
-# for word in neg_mean_vector:
-#     neg_mean_vector[word] = neg_mean_vector[word] / neg_review_count
-# # variance vector portion
-# f2.seek(0)
-# neg_variance_vector = copy.deepcopy(neg_dict)
-# neg_variance_vector = dict.fromkeys(neg_variance_vector, 0)
-# neg_curr_vector = copy.deepcopy(neg_variance_vector)
-# for word in f2.read().split():
-#     if word != "/><br":
-#         if word not in stop_words:
-#             if word[-3:] == "<br":
-#                 word = word[:-3]
-#             if word[:2] == "/>":
-#                 word = word[2:]
-#             if word[-1:] in marks:
-#                 word = word[:-1]
-#             if word[:1] in marks:
-#                 word = word[1:]
-#             word = word.lower()
-#             if word in neg_variance_vector:
-#                 neg_curr_vector[word] += 1
-#     else:
-#         for w in neg_curr_vector:
-#             neg_variance_vector[w] += ((neg_curr_vector[w] - neg_mean_vector[w]) ** 2)
-#         neg_curr_vector = dict.fromkeys(neg_curr_vector, 0)
-# # add last review
-# for word in neg_curr_vector:
-#     neg_variance_vector[word] += ((neg_curr_vector[word] - neg_mean_vector[word]) ** 2)
-# # actual variance vector
-# for word in neg_variance_vector:
-#     neg_variance_vector[word] = neg_variance_vector[word] / neg_review_count
-
-# # recording accuracy for (1)
-# total_guesses_1 = 0
-# correct_guesses_1 = 0
-
-# # reading from positive test data
-# review = {}
-# pos_result = 1.0
-# neg_result = 1.0
-# for w in f3.read().split():
-#     # print(w)
-#     if w != "/><br":
-#         if w[-3:] == "<br":
-#             w = w[:-3]
-#         if w[:2] == "/>":
-#             w = w[2:]
-#         if w[-1:] in marks:
-#             w = w[:-1]
-#         if w[:1] in marks:
-#             w = w[1:]
-#         if w.isalpha():
-#             w = w.lower()
-#             if w not in stop_words:
-#                 if w not in review:
-#                     review[w] = 1
-#                 else:
-#                     review[w] += 1
-#     else:
-#         for word, occur in review.items():
-#             if word in pos_mean_vector:
-#                 pos_mean = pos_mean_vector[word]
-#                 pos_var = pos_variance_vector[word]  
-#                 denom = (2 * math.pi * pos_var) ** 0.5
-#                 num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
-#                 pos_result *= (num / denom)
-#             if word in neg_mean_vector:
-#                 neg_mean = neg_mean_vector[word]
-#                 neg_var = neg_variance_vector[word]
-#                 denom = (2 * math.pi * neg_var) ** 0.5
-#                 num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
-#                 neg_result *= (num / denom)
-#         if pos_result == 0.0 and neg_result == 0.0:
-#             for word, occur in review.items():
-#                 if word in pos_mean_vector:
-#                     pos_mean = pos_mean_vector[word]
-#                     pos_var = pos_variance_vector[word]  
-#                     denom = (2 * math.pi * pos_var) ** 0.5
-#                     num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
-#                     if num / denom != 0:
-#                         pos_result += math.log10(num / denom)
-#                 if word in neg_mean_vector:
-#                     neg_mean = neg_mean_vector[word]
-#                     neg_var = neg_variance_vector[word]
-#                     denom = (2 * math.pi * neg_var) ** 0.5
-#                     num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
-#                     if num / denom != 0:
-#                         neg_result += math.log10(num / denom)
-#         print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result)) 
-#         if pos_result >= neg_result:
-#             print("Predicted: Positive / Actual: Positive")
-#             correct_guesses_1 += 1
-#         else:
-#             print("Predicted: Negative / Actual: Positve")
-#         total_guesses_1 += 1
-#         # reset parameters
-#         review = {}
-#         pos_result = 1.0
-#         neg_result = 1.0
-
-# # reading from negative test data
-# review = {}
-# pos_result = 1.0
-# neg_result = 1.0
-# for w in f4.read().split():
-#     # print(w)
-#     if w != "/><br":
-#         if w[-3:] == "<br":
-#             w = w[:-3]
-#         if w[:2] == "/>":
-#             w = w[2:]
-#         if w[-1:] in marks:
-#             w = w[:-1]
-#         if w[:1] in marks:
-#             w = w[1:]
-#         if w.isalpha():
-#             w = w.lower()
-#             if w not in stop_words:
-#                 if w not in review:
-#                     review[w] = 1
-#                 else:
-#                     review[w] += 1
-#     else:
-#         for word, occur in review.items():
-#             if word in pos_mean_vector:
-#                 pos_mean = pos_mean_vector[word]
-#                 pos_var = pos_variance_vector[word]  
-#                 denom = (2 * math.pi * pos_var) ** 0.5
-#                 num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
-#                 pos_result *= (num / denom)
-#             if word in neg_mean_vector:
-#                 neg_mean = neg_mean_vector[word]
-#                 neg_var = neg_variance_vector[word]
-#                 denom = (2 * math.pi * neg_var) ** 0.5
-#                 num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
-#                 neg_result *= (num / denom)
-#         if pos_result == 0.0 and neg_result == 0.0:
-#             for word, occur in review.items():
-#                 if word in pos_mean_vector:
-#                     pos_mean = pos_mean_vector[word]
-#                     pos_var = pos_variance_vector[word]  
-#                     denom = (2 * math.pi * pos_var) ** 0.5
-#                     num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
-#                     if num / denom != 0:
-#                         pos_result += math.log10(num / denom)
-#                 if word in neg_mean_vector:
-#                     neg_mean = neg_mean_vector[word]
-#                     neg_var = neg_variance_vector[word]
-#                     denom = (2 * math.pi * neg_var) ** 0.5
-#                     num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
-#                     if num / denom != 0:
-#                         neg_result += math.log10(num / denom)
-#         print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
-#         if pos_result >= neg_result:
-#             print("Predicted: Positive / Actual: Negative")
-#         else:
-#             print("Predicted: Negative / Actual: Negative")
-#             correct_guesses_1 += 1
-#         total_guesses_1 += 1
-#         # reset parameters
-#         review = {}
-#         pos_result = 1.0
-#         neg_result = 1.0
-
-###############################################################################################################
-###############################################################################################################
-###############################################################################################################
-
-# (2) gaussian naive bayes classifier using tf-idf feature
 f1.seek(0)
 # mean vector portion
 pos_mean_vector = copy.deepcopy(pos_dict)
@@ -456,6 +218,305 @@ for word in f2.read().split():
 # add last review
 for word in neg_curr_vector:
     neg_variance_vector[word] += ((neg_curr_vector[word] - neg_mean_vector[word]) ** 2)
+# actual variance vector
+for word in neg_variance_vector:
+    neg_variance_vector[word] = neg_variance_vector[word] / neg_review_count
+
+# recording accuracy for (1)
+total_guesses_1 = 0
+correct_guesses_1 = 0
+
+# reading from positive test data
+review = {}
+pos_result = 1.0
+neg_result = 1.0
+for w in f3.read().split():
+    # print(w)
+    if w != "/><br":
+        if w[-3:] == "<br":
+            w = w[:-3]
+        if w[:2] == "/>":
+            w = w[2:]
+        if w[-1:] in marks:
+            w = w[:-1]
+        if w[:1] in marks:
+            w = w[1:]
+        if w.isalpha():
+            w = w.lower()
+            if w not in stop_words:
+                if w not in review:
+                    review[w] = 1
+                else:
+                    review[w] += 1
+    else:
+        for word, occur in review.items():
+            if word in pos_mean_vector:
+                pos_mean = pos_mean_vector[word]
+                pos_var = pos_variance_vector[word]  
+                denom = (2 * math.pi * pos_var) ** 0.5
+                num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
+                pos_result *= (num / denom)
+            if word in neg_mean_vector:
+                neg_mean = neg_mean_vector[word]
+                neg_var = neg_variance_vector[word]
+                denom = (2 * math.pi * neg_var) ** 0.5
+                num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
+                neg_result *= (num / denom)
+        if pos_result == 0.0 and neg_result == 0.0:
+            for word, occur in review.items():
+                if word in pos_mean_vector:
+                    pos_mean = pos_mean_vector[word]
+                    pos_var = pos_variance_vector[word]  
+                    denom = (2 * math.pi * pos_var) ** 0.5
+                    num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
+                    if num / denom != 0:
+                        pos_result += math.log10(num / denom)
+                if word in neg_mean_vector:
+                    neg_mean = neg_mean_vector[word]
+                    neg_var = neg_variance_vector[word]
+                    denom = (2 * math.pi * neg_var) ** 0.5
+                    num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
+                    if num / denom != 0:
+                        neg_result += math.log10(num / denom)
+        print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result)) 
+        if pos_result >= neg_result:
+            print("Predicted: Positive / Actual: Positive")
+            correct_guesses_1 += 1
+        else:
+            print("Predicted: Negative / Actual: Positve")
+        total_guesses_1 += 1
+        # reset parameters
+        review = {}
+        pos_result = 1.0
+        neg_result = 1.0
+
+# reading from negative test data
+review = {}
+pos_result = 1.0
+neg_result = 1.0
+for w in f4.read().split():
+    # print(w)
+    if w != "/><br":
+        if w[-3:] == "<br":
+            w = w[:-3]
+        if w[:2] == "/>":
+            w = w[2:]
+        if w[-1:] in marks:
+            w = w[:-1]
+        if w[:1] in marks:
+            w = w[1:]
+        if w.isalpha():
+            w = w.lower()
+            if w not in stop_words:
+                if w not in review:
+                    review[w] = 1
+                else:
+                    review[w] += 1
+    else:
+        for word, occur in review.items():
+            if word in pos_mean_vector:
+                pos_mean = pos_mean_vector[word]
+                pos_var = pos_variance_vector[word]  
+                denom = (2 * math.pi * pos_var) ** 0.5
+                num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
+                pos_result *= (num / denom)
+            if word in neg_mean_vector:
+                neg_mean = neg_mean_vector[word]
+                neg_var = neg_variance_vector[word]
+                denom = (2 * math.pi * neg_var) ** 0.5
+                num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
+                neg_result *= (num / denom)
+        if pos_result == 0.0 and neg_result == 0.0:
+            for word, occur in review.items():
+                if word in pos_mean_vector:
+                    pos_mean = pos_mean_vector[word]
+                    pos_var = pos_variance_vector[word]  
+                    denom = (2 * math.pi * pos_var) ** 0.5
+                    num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
+                    if num / denom != 0:
+                        pos_result += math.log10(num / denom)
+                if word in neg_mean_vector:
+                    neg_mean = neg_mean_vector[word]
+                    neg_var = neg_variance_vector[word]
+                    denom = (2 * math.pi * neg_var) ** 0.5
+                    num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
+                    if num / denom != 0:
+                        neg_result += math.log10(num / denom)
+        print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
+        if pos_result >= neg_result:
+            print("Predicted: Positive / Actual: Negative")
+        else:
+            print("Predicted: Negative / Actual: Negative")
+            correct_guesses_1 += 1
+        total_guesses_1 += 1
+        # reset parameters
+        review = {}
+        pos_result = 1.0
+        neg_result = 1.0
+
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
+
+# (2) gaussian naive bayes classifier using tf-idf feature
+# calculating mean vector and variance vector for positive reviews
+f1.seek(0)
+# mean vector portion
+review = {}
+pos_mean_vector = copy.deepcopy(pos_dict)
+pos_mean_vector = dict.fromkeys(pos_mean_vector, 0.0)
+pos_word_count = 0
+for word in f1.read().split():
+    if word != "/><br":
+        if word not in stop_words:
+            if word[-3:] == "<br":
+                word = word[:-3]
+            if word[:2] == "/>":
+                word = word[2:]
+            if word[-1:] in marks:
+                word = word[:-1]
+            if word[:1] in marks:
+                word = word[1:]
+            word = word.lower()
+            if word in pos_mean_vector:
+                pos_word_count += 1
+                if word not in review:
+                    review[word] = 1
+                else:
+                    review[word] += 1
+    else:
+        for w in review:
+            tf = review[w] / pos_word_count
+            tmp1 = 0
+            tmp2 = 0
+            if w in pos_word_in_review_vector:
+                tmp1 = pos_word_in_review_vector[w]
+            if w in neg_word_in_review_vector:
+                tmp2 = neg_word_in_review_vector[w]
+            idf = math.log10((pos_review_count + neg_review_count) / (tmp1 + tmp2))
+            if w in pos_mean_vector:
+                pos_mean_vector[w] += (tf/idf)
+        pos_word_count = 0
+# actual mean vector
+for word in pos_mean_vector:
+    pos_mean_vector[word] = pos_mean_vector[word] / pos_review_count
+# variance vector portion
+f1.seek(0)
+review = {}
+pos_variance_vector = copy.deepcopy(pos_dict)
+pos_variance_vector = dict.fromkeys(pos_variance_vector, 0)
+pos_word_count = 0
+for word in f1.read().split():
+    if word != "/><br":
+        if word not in stop_words:
+            if word[-3:] == "<br":
+                word = word[:-3]
+            if word[:2] == "/>":
+                word = word[2:]
+            if word[-1:] in marks:
+                word = word[:-1]
+            if word[:1] in marks:
+                word = word[1:]
+            word = word.lower()
+            if word in pos_variance_vector:
+                pos_word_count += 1
+                if word not in review:
+                    review[word] = 1
+                else:
+                    review[word] += 1
+    else:
+        for w in review:
+            tf = review[w] / pos_word_count
+            tmp1 = 0
+            tmp2 = 0
+            if w in pos_word_in_review_vector:
+                tmp1 = pos_word_in_review_vector[w]
+            if w in neg_word_in_review_vector:
+                tmp2 = neg_word_in_review_vector[w]
+            idf = math.log10((pos_review_count + neg_review_count) / (tmp1 + tmp2))
+            if w in pos_variance_vector:
+                pos_variance_vector[w] += (((tf/idf) - pos_mean_vector[w]) ** 2)
+# actual variance vector
+for word in pos_variance_vector:
+    pos_variance_vector[word] = pos_variance_vector[word] / pos_review_count
+
+# calculating mean vector and variance vector for negative reviews
+f2.seek(0)
+# mean vector portion
+review = {}
+neg_mean_vector = copy.deepcopy(pos_dict)
+neg_mean_vector = dict.fromkeys(neg_mean_vector, 0.0)
+neg_word_count = 0
+for word in f1.read().split():
+    if word != "/><br":
+        if word not in stop_words:
+            if word[-3:] == "<br":
+                word = word[:-3]
+            if word[:2] == "/>":
+                word = word[2:]
+            if word[-1:] in marks:
+                word = word[:-1]
+            if word[:1] in marks:
+                word = word[1:]
+            word = word.lower()
+            if word in neg_mean_vector:
+                neg_word_count += 1
+                if word not in review:
+                    review[word] = 1
+                else:
+                    review[word] += 1
+    else:
+        for w in review:
+            tf = review[w] / neg_word_count
+            tmp1 = 0
+            tmp2 = 0
+            if w in pos_word_in_review_vector:
+                tmp1 = pos_word_in_review_vector[w]
+            if w in neg_word_in_review_vector:
+                tmp2 = neg_word_in_review_vector[w]
+            idf = math.log10((pos_review_count + neg_review_count) / (tmp1 + tmp2))
+            if w in neg_mean_vector:
+                neg_mean_vector[w] += (tf/idf)
+        neg_word_count = 0
+# actual mean vector
+for word in neg_mean_vector:
+    neg_mean_vector[word] = neg_mean_vector[word] / neg_review_count
+# variance vector portion
+f1.seek(0)
+review = {}
+neg_variance_vector = copy.deepcopy(pos_dict)
+neg_variance_vector = dict.fromkeys(neg_variance_vector, 0)
+pos_word_count = 0
+for word in f1.read().split():
+    if word != "/><br":
+        if word not in stop_words:
+            if word[-3:] == "<br":
+                word = word[:-3]
+            if word[:2] == "/>":
+                word = word[2:]
+            if word[-1:] in marks:
+                word = word[:-1]
+            if word[:1] in marks:
+                word = word[1:]
+            word = word.lower()
+            if word in neg_variance_vector:
+                neg_word_count += 1
+                if word not in review:
+                    review[word] = 1
+                else:
+                    review[word] += 1
+    else:
+        for w in review:
+            tf = review[w] / neg_word_count
+            tmp1 = 0
+            tmp2 = 0
+            if w in pos_word_in_review_vector:
+                tmp1 = pos_word_in_review_vector[w]
+            if w in neg_word_in_review_vector:
+                tmp2 = neg_word_in_review_vector[w]
+            idf = math.log10((pos_review_count + neg_review_count) / (tmp1 + tmp2))
+            if w in neg_variance_vector:
+                neg_variance_vector[w] += (((tf/idf) - neg_mean_vector[w]) ** 2)
 # actual variance vector
 for word in neg_variance_vector:
     neg_variance_vector[word] = neg_variance_vector[word] / neg_review_count
