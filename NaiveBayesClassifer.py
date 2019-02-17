@@ -33,6 +33,7 @@ print("Training data, please wait patiently...")
 # reading from positive training data
 pos_dict = {}
 total_pos_words = 0
+total_pos_review = 0
 for word in f1.read().split():
     # print(word)
     if word != "/><br":
@@ -52,11 +53,15 @@ for word in f1.read().split():
                 else:
                     pos_dict[word] = 1
                 total_pos_words += 1
+    else:
+        total_pos_review += 1
+total_pos_review += 1
 total_pos_words += 1
 
 # reading from negative training data
 neg_dict = {}
 total_neg_words = 0
+total_neg_review = 0
 for word in f2.read().split():
     # print(word)
     if word != "/><br":
@@ -76,6 +81,9 @@ for word in f2.read().split():
                 else:
                     neg_dict[word] = 1
                 total_neg_words += 1
+    else:
+        total_neg_review += 1
+total_neg_review += 1
 total_neg_words += 1
 
 # combining data from both sets
