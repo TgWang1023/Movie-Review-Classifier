@@ -91,7 +91,7 @@ for word, count in neg_dict.items():
 # calculating mean vector and variance vector for positive reviews
 f1.seek(0)
 # mean vector portion
-pos_mean_vector = copy.deepcopy(total_dict)
+pos_mean_vector = copy.deepcopy(pos_dict)
 pos_mean_vector = dict.fromkeys(pos_mean_vector, 0)
 pos_review_count = 0
 for word in f1.read().split():
@@ -105,8 +105,8 @@ for word in f1.read().split():
                 word = word[:-1]
             if word[:1] in marks:
                 word = word[1:]
-            if word in pos_dict:
-                pos_mean_vector[word] += 1
+            word = word.lower()
+            pos_mean_vector[word] += 1
     else:
         pos_review_count += 1
 # add last review
@@ -114,11 +114,9 @@ pos_review_count += 1
 # actual mean vector
 for word in pos_mean_vector:
     pos_mean_vector[word] = pos_mean_vector[word] / pos_review_count
-print("Pos Mean Vector:")
-print(pos_mean_vector)
 # variance vector portion
 f1.seek(0)
-pos_variance_vector = copy.deepcopy(total_dict)
+pos_variance_vector = copy.deepcopy(pos_dict)
 pos_variance_vector = dict.fromkeys(pos_variance_vector, 0)
 pos_curr_vector = copy.deepcopy(pos_variance_vector)
 for word in f1.read().split():
@@ -132,6 +130,7 @@ for word in f1.read().split():
                 word = word[:-1]
             if word[:1] in marks:
                 word = word[1:]
+            word = word.lower()
             pos_curr_vector[word] += 1
     else:
         for w in pos_curr_vector:
@@ -143,13 +142,11 @@ for word in pos_curr_vector:
 # actual variance vector
 for word in pos_variance_vector:
     pos_variance_vector[word] = pos_variance_vector[word] / pos_review_count
-print("Pos Variance Vector:")
-print(pos_variance_vector)
 
 # calculating mean vector and variance vector for negative reviews
 f2.seek(0)
 # mean vector portion
-neg_mean_vector = copy.deepcopy(total_dict)
+neg_mean_vector = copy.deepcopy(neg_dict)
 neg_mean_vector = dict.fromkeys(neg_mean_vector, 0)
 neg_review_count = 0
 for word in f2.read().split():
@@ -163,8 +160,8 @@ for word in f2.read().split():
                 word = word[:-1]
             if word[:1] in marks:
                 word = word[1:]
-            if word in neg_dict:
-                neg_mean_vector[word] += 1
+            word = word.lower()
+            neg_mean_vector[word] += 1
     else:
         neg_review_count += 1
 # add last review
@@ -172,11 +169,9 @@ neg_review_count += 1
 # actual mean vector
 for word in neg_mean_vector:
     neg_mean_vector[word] = neg_mean_vector[word] / neg_review_count
-print("Neg Mean Vector:")
-print(neg_mean_vector)
 # variance vector portion
 f2.seek(0)
-neg_variance_vector = copy.deepcopy(total_dict)
+neg_variance_vector = copy.deepcopy(neg_dict)
 neg_variance_vector = dict.fromkeys(neg_variance_vector, 0)
 neg_curr_vector = copy.deepcopy(neg_variance_vector)
 for word in f2.read().split():
@@ -190,6 +185,7 @@ for word in f2.read().split():
                 word = word[:-1]
             if word[:1] in marks:
                 word = word[1:]
+            word = word.lower()
             neg_curr_vector[word] += 1
     else:
         for w in neg_curr_vector:
@@ -201,8 +197,6 @@ for word in neg_curr_vector:
 # actual variance vector
 for word in neg_variance_vector:
     neg_variance_vector[word] = neg_variance_vector[word] / neg_review_count
-print("Neg Variance Vector:")
-print(neg_variance_vector)
 
 # recording accuracy for (1)
 total_guesses_1 = 0
@@ -232,12 +226,14 @@ for w in f3.read().split():
                     review[w] += 1
     else:
         for word, occur in review.items():
-            pos_mean = pos_mean_vector[word]
-            pos_var = pos_variance_vector[word]
-            neg_mean = neg_mean_vector[word]
-            neg_var = neg_variance_vector[word]
-            pos_result *= sp.norm(pos_mean, pos_var).pdf(occur)
-            neg_result *= sp.norm(neg_mean, neg_var).pdf(occur)
+            if word in pos_mean_vector:
+                pos_mean = pos_mean_vector[word]
+                pos_var = pos_variance_vector[word]    
+                pos_result *= sp.norm(pos_mean, pos_var).pdf(occur)
+            if word in neg_mean_vector:
+                neg_mean = neg_mean_vector[word]
+                neg_var = neg_variance_vector[word]
+                neg_result *= sp.norm(neg_mean, neg_var).pdf(occur) 
         if pos_result >= neg_result:
             print("Predicted: Positive / Actual: Positive")
             correct_guesses_1 += 1
@@ -273,12 +269,14 @@ for w in f4.read().split():
                     review[w] += 1
     else:
         for word, occur in review:
-            pos_mean = pos_mean_vector[word]
-            pos_var = pos_variance_vector[word]
-            neg_mean = neg_mean_vector[word]
-            neg_var = neg_variance_vector[word]
-            pos_result *= sp.norm(pos_mean, pos_var).pdf(occur)
-            neg_result *= sp.norm(neg_mean, neg_var).pdf(occur)
+            if word in pos_mean_vector:
+                pos_mean = pos_mean_vector[word]
+                pos_var = pos_variance_vector[word]
+                pos_result *= sp.norm(pos_mean, pos_var).pdf(occur)
+            if word in neg_mean_vector:
+                neg_mean = neg_mean_vector[word]
+                neg_var = neg_variance_vector[word]
+                neg_result *= sp.norm(neg_mean, neg_var).pdf(occur) 
         if pos_result >= neg_result:
             print("Predicted: Positive / Actual: Negative")
         else:
