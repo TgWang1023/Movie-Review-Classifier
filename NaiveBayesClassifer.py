@@ -29,7 +29,7 @@ stop_words = {"a", "about", "above", "after", "again", "against", "all", "am", "
     "until", "up", "very", "was", "we", "we'd", "we'll", "we're", "we've", "were", "what", "what's", "when", "when's", "where", "where's", "which", "while", "who", "who's", 
     "whom", "why", "why's", "with", "would", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"}
 
-print("Training data, please wait patiently...")
+print("Training and Analyzing data, please wait...")
 # reading from positive training data
 pos_dict = {}
 review = {}
@@ -349,7 +349,6 @@ for w in f4.read().split():
 ###############################################################################################################
 ###############################################################################################################
 ###############################################################################################################
-print("part2")
 # (2) gaussian naive bayes classifier using tf-idf feature
 # calculating mean vector and variance vector for positive reviews
 f1.seek(0)
@@ -433,7 +432,6 @@ for word in f1.read().split():
 # actual variance vector
 for word in pos_variance_vector:
     pos_variance_vector[word] = pos_variance_vector[word] / pos_review_count
-print(pos_variance_vector)
 # calculating mean vector and variance vector for negative reviews
 f2.seek(0)
 # mean vector portion
@@ -516,13 +514,11 @@ for word in f1.read().split():
 # actual variance vector
 for word in neg_variance_vector:
     neg_variance_vector[word] = neg_variance_vector[word] / neg_review_count
-print(neg_variance_vector)
 # recording accuracy for (2)
 total_guesses_2 = 0
 correct_guesses_2 = 0
 
 # reading from positive test data
-print("reading")
 f3.seek(0)
 review = {}
 pos_result = 1.0
@@ -577,12 +573,8 @@ for w in f3.read().split():
                     num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
                     if num / denom != 0:
                         neg_result += math.log10(num / denom)
-        print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result)) 
         if pos_result >= neg_result:
-            print("Predicted: Positive / Actual: Positive")
             correct_guesses_2 += 1
-        else:
-            print("Predicted: Negative / Actual: Positve")
         total_guesses_2 += 1
         # reset parameters
         review = {}
@@ -644,11 +636,7 @@ for w in f4.read().split():
                     num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
                     if num / denom != 0:
                         neg_result += math.log10(num / denom)
-        print("Positive Probability: " + str(pos_result) + ", Negative Probability: " + str(neg_result))
-        if pos_result >= neg_result:
-            print("Predicted: Positive / Actual: Negative")
-        else:
-            print("Predicted: Negative / Actual: Negative")
+        if pos_result <= neg_result:
             correct_guesses_2 += 1
         total_guesses_2 += 1
         # reset parameters
