@@ -316,14 +316,16 @@ for w in f4.read().split():
                 pos_mean = pos_mean_vector[word]
                 pos_var = pos_variance_vector[word]  
                 denom = (2 * math.pi * pos_var) ** 0.5
-                num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
-                pos_result *= (num / denom)
+                if pos_var != 0:
+                    num = math.exp(-(float(occur)-float(pos_mean)) ** 2 / (2 * pos_var))
+                    pos_result *= (num / denom)
             if word in neg_mean_vector:
                 neg_mean = neg_mean_vector[word]
                 neg_var = neg_variance_vector[word]
                 denom = (2 * math.pi * neg_var) ** 0.5
-                num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
-                neg_result *= (num / denom)
+                if neg_var != 0:
+                    num = math.exp(-(float(occur)-float(neg_mean)) ** 2 / (2 * neg_var))
+                    neg_result *= (num / denom)
         if pos_result == 0.0 and neg_result == 0.0:
             for word, occur in review.items():
                 if word in pos_mean_vector:
